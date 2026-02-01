@@ -1,0 +1,2127 @@
+/* --- PITCHWALKER ULTIMATE - FIFA 98 RETRO EDITION --- */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+:root { 
+    --bg: #0a0a1a;
+    --panel: #1a1a2e;
+    --card: #16213e;
+    --accent: #ffffff;
+    --gold: #ffd700;
+    --text: #ffffff;
+    --text-dim: #8888aa;
+    --green: #00ff00;
+    --red: #ff0040;
+    --purple: #ff00ff;
+    --blue: #00aaff;
+    --bronze: #cd7f32;
+    --silver: #c0c0c0;
+    --special: #ff0080;
+    --icon: #00ffff;
+    --retro-red: #cc0000;
+    --retro-white: #ffffff;
+    --retro-blue: #003399;
+}
+
+html, body { 
+    height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; 
+    background-color: var(--bg); 
+    font-family: 'VT323', monospace; 
+    color: var(--text); 
+    font-size: 16px; 
+    user-select: none;
+    image-rendering: pixelated;
+}
+
+/* CRT SCANLINE EFFECT */
+.crt::before { 
+    content: ""; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; 
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    z-index: 100000; pointer-events: none; 
+}
+
+.crt::after {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 100%);
+    z-index: 100001;
+    pointer-events: none;
+}
+
+/* RETRO PIXEL BUTTONS */
+.btn { 
+    background: linear-gradient(180deg, var(--retro-red) 0%, #990000 100%);
+    color: white; 
+    border: 4px solid #000;
+    box-shadow: 4px 4px 0 #000, inset 2px 2px 0 rgba(255,255,255,0.3);
+    padding: 12px 16px; 
+    width: 100%; 
+    margin-top: 10px; 
+    font-family: 'Press Start 2P', monospace; 
+    font-size: 10px; 
+    border-radius: 0; 
+    cursor: pointer; 
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: transform 0.05s;
+    text-shadow: 2px 2px 0 #000;
+}
+.btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000, inset 2px 2px 0 rgba(255,255,255,0.3); }
+.btn:hover { filter: brightness(1.1); }
+.btn-red { background: linear-gradient(180deg, #ff0040 0%, #aa0030 100%); }
+.btn-green { background: linear-gradient(180deg, #00cc00 0%, #008800 100%); color: #fff; }
+.btn-purple { background: linear-gradient(180deg, #cc00cc 0%, #880088 100%); }
+.btn-blue { background: linear-gradient(180deg, var(--retro-blue) 0%, #004499 100%); }
+.btn-gold { background: linear-gradient(180deg, #ffd700 0%, #cc9900 100%); color: #000; text-shadow: none; }
+.btn-white { background: linear-gradient(180deg, #ffffff 0%, #cccccc 100%); color: #000; text-shadow: none; }
+.btn-sm { padding: 8px 12px; font-size: 8px; width: auto; display: inline-block; margin: 5px; }
+
+/* RETRO INPUT */
+.input-field {
+    background: #000;
+    border: 4px solid #444;
+    box-shadow: inset 4px 4px 0 rgba(0,0,0,0.5);
+    color: var(--green);
+    font-family: 'VT323', monospace;
+    font-size: 24px;
+    padding: 15px;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    text-transform: uppercase;
+}
+.input-field::placeholder { color: #446644; }
+.input-field:focus { outline: none; border-color: var(--green); }
+
+/* MAP - FIFA 98 RETRO STYLE */
+#map-container { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+    border: 6px solid #000;
+    box-sizing: border-box;
+}
+#map { 
+    width: 100%; height: 100%; 
+    background: #002200; 
+    image-rendering: pixelated;
+}
+.leaflet-layer { 
+    filter: saturate(120%) contrast(140%) brightness(0.85) sepia(15%);
+    image-rendering: pixelated;
+}
+.leaflet-tile { 
+    image-rendering: pixelated !important;
+    filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='pixelate'%3E%3CfeFlood x='2' y='2' height='1' width='1'/%3E%3CfeComposite width='4' height='4'/%3E%3CfeTile result='a'/%3E%3CfeComposite in='SourceGraphic' in2='a' operator='in'/%3E%3CfeMorphology operator='dilate' radius='2'/%3E%3C/filter%3E%3C/svg%3E#pixelate");
+}
+.pixel-icon { pointer-events: auto !important; cursor: pointer; z-index: 1000 !important; image-rendering: pixelated; }
+
+/* CRT Scanlines Overlay */
+#map-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15) 0px,
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+    z-index: 1500;
+}
+
+/* Retro screen glow */
+#map-container::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    box-shadow: inset 0 0 80px rgba(0, 50, 0, 0.5), inset 0 0 20px rgba(0, 100, 0, 0.3);
+    pointer-events: none;
+    z-index: 1501;
+}
+
+/* Corner brackets - FIFA 98 style */
+.map-corner {
+    position: absolute;
+    width: 30px; height: 30px;
+    border: 4px solid var(--gold);
+    z-index: 1600;
+    pointer-events: none;
+}
+.map-corner.top-left { top: 15px; left: 15px; border-right: none; border-bottom: none; }
+.map-corner.top-right { top: 15px; right: 15px; border-left: none; border-bottom: none; }
+.map-corner.bottom-left { bottom: 80px; left: 15px; border-right: none; border-top: none; }
+.map-corner.bottom-right { bottom: 80px; right: 15px; border-left: none; border-top: none; }
+
+/* Retro radar sweep animation */
+.radar-sweep {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 200px; height: 200px;
+    margin: -100px 0 0 -100px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(0, 255, 0, 0.1) 30deg, transparent 60deg);
+    animation: radarSweep 4s linear infinite;
+    pointer-events: none;
+    z-index: 1502;
+    opacity: 0.5;
+}
+@keyframes radarSweep {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.map-stats { 
+    position: absolute; top: 15px; left: 50%; transform: translateX(-50%); 
+    display: flex; gap: 8px; z-index: 2000; 
+}
+.stat-pill { 
+    background: #000; 
+    padding: 8px 12px; 
+    border: 3px solid var(--gold); 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px; 
+    box-shadow: 3px 3px 0 #000;
+}
+
+.store-btn { 
+    position: absolute; top: 20px; left: 20px; 
+    background: linear-gradient(180deg, #ff6600 0%, #cc4400 100%);
+    border: 4px solid #000; 
+    box-shadow: 4px 4px 0 #000;
+    color: #fff; 
+    font-size: 20px; 
+    width: 55px; height: 55px; 
+    z-index: 2000; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+.map-btn { 
+    position: absolute; top: 20px; right: 20px; 
+    background: linear-gradient(180deg, var(--gold) 0%, #cc9900 100%);
+    border: 4px solid #000; 
+    box-shadow: 4px 4px 0 #000;
+    color: #000; 
+    font-size: 20px; 
+    width: 55px; height: 55px; 
+    z-index: 2000; cursor: pointer;
+}
+
+/* VIEWS */
+.view-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; z-index: 1; }
+.view-container.active { display: flex; z-index: 10; }
+.full-panel { 
+    background: linear-gradient(180deg, #0a0a1a 0%, #1a1a3a 100%); 
+    height: 100%; width: 100%; 
+    overflow-y: auto; 
+    padding-bottom: 180px; 
+    box-sizing: border-box; 
+}
+
+.panel-header { 
+    padding: 20px; 
+    text-align: center; 
+    background: linear-gradient(180deg, var(--retro-red) 0%, #880000 100%);
+    border-bottom: 4px solid #000;
+}
+.panel-header h2 { 
+    margin: 0; 
+    color: var(--gold); 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px; 
+    letter-spacing: 2px;
+    text-shadow: 3px 3px 0 #000;
+}
+.panel-subtitle { color: #ffcccc; margin-top: 8px; font-size: 14px; }
+
+/* SQUAD VIEW */
+.squad-stats { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+.stat-badge { 
+    background: #000; 
+    padding: 8px 12px; 
+    border: 3px solid var(--gold);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px; 
+}
+.stat-badge strong { color: var(--gold); }
+
+.pitch-container { 
+    position: relative;
+    width: calc(100% - 20px); 
+    margin: 10px auto;
+    aspect-ratio: 4/3;
+    max-height: 320px;
+    min-height: 220px;
+    background: 
+        linear-gradient(90deg, transparent 49.5%, rgba(255,255,255,0.4) 49.5%, rgba(255,255,255,0.4) 50.5%, transparent 50.5%),
+        repeating-linear-gradient(
+            90deg,
+            #1a5c1a 0px,
+            #1a5c1a 25px,
+            #228b22 25px,
+            #228b22 50px
+        );
+    border: 5px solid #fff;
+    box-shadow: 4px 4px 0 #000, inset 0 0 30px rgba(0,0,0,0.3);
+    box-sizing: border-box;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.pitch-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70px;
+    height: 70px;
+    border: 3px solid rgba(255,255,255,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.pitch-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 45px;
+    border: 3px solid rgba(255,255,255,0.4);
+    border-bottom: none;
+    border-radius: 0 0 0 0;
+    pointer-events: none;
+}
+.pitch-slot { 
+    position: absolute; 
+    transform: translate(-50%, -50%);
+    text-align: center;
+    cursor: pointer;
+}
+.pitch-slot.empty .pitch-card-empty { 
+    width: 40px; height: 55px; 
+    background: rgba(0,0,0,0.6); 
+    border: 3px dashed rgba(255,255,255,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: rgba(255,255,255,0.5);
+}
+.pitch-slot.filled .pitch-card-mini { 
+    width: 40px; height: 55px; 
+    background: linear-gradient(180deg, #333 0%, #111 100%);
+    border: 3px solid var(--gold);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px; font-weight: bold;
+}
+.pitch-name { 
+    font-family: 'VT323', monospace;
+    font-size: 11px; 
+    margin-top: 2px; 
+    color: #fff; 
+    text-shadow: 1px 1px 0 #000; 
+}
+
+.rarity-slot-bronze .pitch-card-mini { border-color: var(--bronze); background: linear-gradient(180deg, #8b5a2b 0%, #4a2c0a 100%); }
+.rarity-slot-silver .pitch-card-mini { border-color: var(--silver); background: linear-gradient(180deg, #888 0%, #444 100%); }
+.rarity-slot-gold .pitch-card-mini { border-color: var(--gold); background: linear-gradient(180deg, #aa8800 0%, #553300 100%); }
+.rarity-slot-special .pitch-card-mini { border-color: var(--special); background: linear-gradient(180deg, #aa0055 0%, #550033 100%); box-shadow: 0 0 10px var(--special); }
+.rarity-slot-icon .pitch-card-mini { border-color: var(--icon); background: linear-gradient(180deg, #006666 0%, #003333 100%); box-shadow: 0 0 10px var(--icon); }
+
+.squad-actions { display: flex; gap: 10px; padding: 0 10px; }
+.squad-actions .btn { flex: 1; }
+
+.roster-section { 
+    padding: 15px; 
+    background: linear-gradient(180deg, rgba(20,20,40,0.8) 0%, rgba(10,10,30,0.9) 100%);
+    border-top: 3px solid var(--gold);
+    margin-top: 10px;
+}
+.roster-section h3 { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: var(--gold); 
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+#squad-list-container {
+    max-height: 45vh;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.squad-list-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #0d0d1f 100%);
+    border: 2px solid #333;
+    border-left: 4px solid #555;
+    margin-bottom: 8px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.squad-list-item:hover {
+    transform: translateX(5px);
+    border-color: #666;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.squad-list-item:active {
+    transform: scale(0.98);
+}
+
+.squad-list-item.rarity-bronze { border-left-color: var(--bronze); }
+.squad-list-item.rarity-silver { border-left-color: var(--silver); }
+.squad-list-item.rarity-gold { border-left-color: var(--gold); background: linear-gradient(135deg, #2a2a1e 0%, #1a1a0d 100%); }
+.squad-list-item.rarity-special { border-left-color: var(--special); background: linear-gradient(135deg, #2a1a2e 0%, #1a0d1f 100%); box-shadow: 0 0 10px rgba(255,0,128,0.2); }
+.squad-list-item.rarity-icon { border-left-color: var(--icon); background: linear-gradient(135deg, #1a2a2e 0%, #0d1a1f 100%); box-shadow: 0 0 10px rgba(0,255,255,0.2); }
+
+.squad-player-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #222;
+    flex-shrink: 0;
+    font-size: 20px;
+}
+
+.squad-player-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.squad-list-ovr {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--gold);
+    min-width: 35px;
+    text-align: center;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.player-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.player-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.player-details {
+    font-family: 'VT323', monospace;
+    font-size: 14px;
+    color: #888;
+    margin-top: 3px;
+}
+
+.player-rarity-badge {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 6px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.rarity-badge-bronze { background: linear-gradient(180deg, var(--bronze), #8b5a2b); color: #fff; }
+.rarity-badge-silver { background: linear-gradient(180deg, var(--silver), #888); color: #000; }
+.rarity-badge-gold { background: linear-gradient(180deg, var(--gold), #b8860b); color: #000; }
+.rarity-badge-special { background: linear-gradient(180deg, var(--special), #aa0055); color: #fff; }
+.rarity-badge-icon { background: linear-gradient(180deg, var(--icon), #008888); color: #000; }
+
+.filter-bar { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+.filter-btn { 
+    background: #222; 
+    border: 3px solid #444; 
+    color: #888; 
+    padding: 8px 12px; 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    cursor: pointer; 
+}
+.filter-btn.active { background: var(--retro-blue); border-color: #fff; color: #fff; }
+
+/* PLAYER CARDS - RETRO STYLE */
+.player-card-compact { 
+    display: flex; 
+    background: linear-gradient(180deg, #222 0%, #111 100%);
+    border: 3px solid #444; 
+    margin-bottom: 8px; 
+    padding: 10px;
+    align-items: center; 
+    gap: 12px;
+    box-shadow: 3px 3px 0 #000;
+}
+.player-card-compact.rarity-bronze { border-color: var(--bronze); }
+.player-card-compact.rarity-silver { border-color: var(--silver); }
+.player-card-compact.rarity-gold { border-color: var(--gold); }
+.player-card-compact.rarity-special { border-color: var(--special); box-shadow: 0 0 15px var(--special), 3px 3px 0 #000; }
+.player-card-compact.rarity-icon { border-color: var(--icon); box-shadow: 0 0 15px var(--icon), 3px 3px 0 #000; }
+
+.card-ovr { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px; 
+    font-weight: bold; 
+    color: var(--gold);
+    min-width: 40px;
+    text-align: center;
+    text-shadow: 2px 2px 0 #000;
+}
+.card-info { flex: 1; }
+.card-name { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px; 
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #000;
+}
+.card-meta { font-size: 14px; color: var(--text-dim); margin-top: 4px; }
+.card-actions { display: flex; gap: 5px; }
+.card-btn { 
+    background: var(--retro-blue); 
+    border: 2px solid #000; 
+    color: #fff; 
+    padding: 6px 10px; 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+}
+.card-btn:hover { filter: brightness(1.2); }
+.card-btn.sell { background: var(--retro-red); }
+
+/* INTRO SCREEN - FIFA 98 STYLE */
+#intro-layer { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: linear-gradient(180deg, #000033 0%, #000066 50%, #000033 100%);
+    display: flex; align-items: center; justify-content: center; 
+    z-index: 50000;
+    overflow: hidden;
+}
+
+#intro-layer::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(255,0,0,0.1) 0%, transparent 30%),
+        radial-gradient(circle at 80% 70%, rgba(255,215,0,0.1) 0%, transparent 30%);
+    animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.title-container { 
+    text-align: center; 
+    padding: 30px;
+    z-index: 1;
+}
+
+.intro-logo { 
+    font-size: 80px; 
+    animation: bounce 1s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(255,215,0,0.5));
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.game-title { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 28px; 
+    color: var(--retro-red);
+    text-shadow: 4px 4px 0 var(--retro-white), 8px 8px 0 #000;
+    margin: 20px 0 5px 0;
+    letter-spacing: 2px;
+}
+.title-sub { 
+    display: block;
+    font-size: 20px;
+    color: var(--retro-blue);
+    text-shadow: 3px 3px 0 var(--retro-white), 6px 6px 0 #000;
+    margin-top: 5px;
+}
+.version-tag { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: #888; 
+    margin: 15px 0;
+    letter-spacing: 2px;
+}
+.tagline { 
+    font-family: 'VT323', monospace;
+    font-size: 20px;
+    color: var(--retro-white); 
+    margin-bottom: 30px;
+    animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.start-btn { 
+    background: linear-gradient(180deg, var(--green) 0%, #008800 100%);
+    font-size: 12px !important;
+    padding: 18px 40px !important;
+    animation: glow 1.5s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 4px 4px 0 #000, 0 0 20px rgba(0,255,0,0.3); }
+    50% { box-shadow: 4px 4px 0 #000, 0 0 40px rgba(0,255,0,0.6); }
+}
+
+.login-box { 
+    display: none; 
+    background: linear-gradient(180deg, #1a1a3a 0%, #0a0a1a 100%);
+    border: 4px solid var(--gold);
+    box-shadow: 8px 8px 0 #000;
+    padding: 30px; 
+    width: 90%; 
+    max-width: 350px;
+    z-index: 1;
+}
+.login-box h2 { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 20px;
+}
+
+/* BOTTOM NAV - RETRO */
+.bottom-nav { 
+    position: fixed; bottom: 0; left: 0; right: 0; 
+    background: linear-gradient(180deg, #222 0%, #000 100%);
+    border-top: 4px solid var(--gold);
+    display: flex; 
+    z-index: 10000; 
+    padding: 8px 0;
+    box-shadow: 0 -4px 0 #000;
+}
+.nav-btn { 
+    flex: 1; 
+    background: none; 
+    border: none; 
+    color: #666; 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    padding: 10px 5px; 
+    cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.nav-btn .nav-icon { font-size: 20px; }
+.nav-btn.active { color: var(--gold); }
+.nav-btn:hover { color: #fff; }
+
+/* MANAGER CUSTOMIZATION */
+.manager-preview {
+    width: 150px;
+    height: 200px;
+    margin: 20px auto;
+    background: linear-gradient(180deg, #1a1a3a 0%, #0a0a1a 100%);
+    border: 4px solid var(--gold);
+    box-shadow: 4px 4px 0 #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.manager-sprite {
+    image-rendering: pixelated;
+    transform: scale(2);
+}
+
+.wardrobe-section {
+    padding: 15px;
+}
+
+.wardrobe-category {
+    margin-bottom: 20px;
+}
+
+.wardrobe-category h4 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: var(--gold);
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.wardrobe-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.wardrobe-item {
+    width: 60px;
+    height: 60px;
+    background: #222;
+    border: 3px solid #444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.wardrobe-item.unlocked {
+    border-color: var(--green);
+}
+
+.wardrobe-item.equipped {
+    border-color: var(--gold);
+    box-shadow: 0 0 10px var(--gold);
+}
+
+.wardrobe-item.locked {
+    opacity: 0.5;
+}
+
+.wardrobe-item.locked::after {
+    content: "🔒";
+    position: absolute;
+    font-size: 16px;
+}
+
+.wardrobe-item img,
+.wardrobe-item svg {
+    width: 40px;
+    height: 40px;
+    image-rendering: pixelated;
+}
+
+/* TOAST */
+#game-toast { 
+    position: fixed; top: 180px; left: 50%; transform: translateX(-50%) translateY(-100px); 
+    background: linear-gradient(180deg, var(--gold) 0%, #cc9900 100%);
+    color: #000; 
+    padding: 12px 20px; 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    z-index: 99999; 
+    border: 4px solid #000;
+    box-shadow: 4px 4px 0 #000;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    max-width: 280px;
+    text-align: center;
+}
+#game-toast::after {
+    content: ' ✕';
+    opacity: 0.6;
+    font-size: 10px;
+}
+#game-toast.show { transform: translateX(-50%) translateY(0); }
+
+/* GPS STATUS */
+#gps-status { 
+    position: fixed; top: 15px; right: 85px; 
+    width: 12px; height: 12px; 
+    border: 2px solid #000;
+    z-index: 99998;
+    animation: pulse-gps 2s infinite;
+}
+.status-dot { background: var(--red); }
+.status-dot.gps-fix { background: var(--green); }
+
+@keyframes pulse-gps {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* MODALS */
+.modal-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.9); 
+    z-index: 20000; 
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.modal-content { 
+    background: linear-gradient(180deg, #1a1a3a 0%, #0a0a1a 100%);
+    border: 4px solid var(--gold);
+    box-shadow: 8px 8px 0 #000;
+    width: 100%; max-width: 400px; 
+    max-height: 80vh; 
+    overflow-y: auto;
+}
+.modal-header { 
+    background: linear-gradient(180deg, var(--retro-red) 0%, #880000 100%);
+    padding: 15px; 
+    border-bottom: 4px solid #000;
+}
+.modal-header h3 { 
+    margin: 0; 
+    color: var(--gold);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    text-shadow: 2px 2px 0 #000;
+}
+.modal-body { padding: 15px; }
+
+/* PACK OPENING */
+.pack-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: radial-gradient(circle, #000066 0%, #000022 100%);
+    z-index: 30000; 
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+}
+.pack-wrapper { text-align: center; animation: packFloat 2s ease-in-out infinite; cursor: pointer; }
+@keyframes packFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.05); }
+}
+.pack-body { 
+    font-size: 120px; 
+    filter: drop-shadow(0 0 30px rgba(255,215,0,0.5));
+}
+.pack-label { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: var(--gold); 
+    margin-top: 20px;
+    animation: blink 1s ease-in-out infinite;
+    text-shadow: 2px 2px 0 #000;
+}
+
+/* PACK RIPPING ANIMATION */
+.pack-rip-container {
+    position: relative;
+    width: 200px;
+    height: 280px;
+    perspective: 1000px;
+}
+.pack-rip-left, .pack-rip-right {
+    position: absolute;
+    width: 100px;
+    height: 280px;
+    background: linear-gradient(135deg, #1a1a3e 0%, #0d0d1f 100%);
+    border: 4px solid var(--gold);
+    overflow: hidden;
+}
+.pack-rip-left {
+    left: 0;
+    border-right: 2px dashed var(--gold);
+    transform-origin: left center;
+    animation: ripLeft 0.6s ease-out forwards;
+}
+.pack-rip-right {
+    right: 0;
+    border-left: 2px dashed var(--gold);
+    transform-origin: right center;
+    animation: ripRight 0.6s ease-out forwards;
+}
+@keyframes ripLeft {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(-90deg) translateX(-50px); opacity: 0; }
+}
+@keyframes ripRight {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(90deg) translateX(50px); opacity: 0; }
+}
+.pack-rip-left::before, .pack-rip-right::before {
+    content: "📦";
+    font-size: 60px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.pack-rip-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    animation: glowExpand 0.6s 0.3s ease-out forwards;
+}
+@keyframes glowExpand {
+    0% { width: 0; height: 0; opacity: 1; }
+    100% { width: 400px; height: 400px; opacity: 0; }
+}
+.pack-rip-glow.bronze { background: radial-gradient(circle, var(--bronze) 0%, transparent 70%); }
+.pack-rip-glow.silver { background: radial-gradient(circle, var(--silver) 0%, transparent 70%); }
+.pack-rip-glow.gold { background: radial-gradient(circle, var(--gold) 0%, transparent 70%); }
+.pack-rip-glow.special { background: radial-gradient(circle, var(--special) 0%, transparent 70%); }
+.pack-rip-glow.icon { background: radial-gradient(circle, var(--icon) 0%, transparent 70%); }
+
+/* CARD REVEAL ANIMATIONS */
+.pack-card { 
+    background: linear-gradient(180deg, #222 0%, #111 100%);
+    border: 4px solid var(--gold);
+    box-shadow: 8px 8px 0 #000;
+    padding: 20px;
+    text-align: center;
+    animation: cardRevealBasic 0.5s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+@keyframes cardRevealBasic {
+    from { transform: scale(0) rotateY(180deg); opacity: 0; }
+    to { transform: scale(1) rotateY(0); opacity: 1; }
+}
+
+/* BRONZE/SILVER - Simple flip reveal */
+.pack-card.rarity-bronze { border-color: var(--bronze); animation: cardRevealBasic 0.4s ease-out; }
+.pack-card.rarity-silver { border-color: var(--silver); animation: cardRevealBasic 0.4s ease-out; }
+
+/* GOLD - Glow reveal */
+.pack-card.rarity-gold { 
+    border-color: var(--gold); 
+    box-shadow: 0 0 30px var(--gold), 8px 8px 0 #000; 
+    animation: cardRevealGold 0.6s ease-out;
+}
+@keyframes cardRevealGold {
+    0% { transform: scale(0) rotateY(180deg); opacity: 0; filter: brightness(3); }
+    50% { filter: brightness(2); }
+    100% { transform: scale(1) rotateY(0); opacity: 1; filter: brightness(1); }
+}
+
+/* SPECIAL - Dramatic spin with flash */
+.pack-card.rarity-special { 
+    border-color: var(--special); 
+    box-shadow: 0 0 40px var(--special), 8px 8px 0 #000; 
+    animation: cardRevealSpecial 0.8s ease-out;
+}
+@keyframes cardRevealSpecial {
+    0% { transform: scale(0) rotateY(720deg); opacity: 0; }
+    40% { transform: scale(1.2) rotateY(180deg); opacity: 1; filter: brightness(3); }
+    60% { transform: scale(0.9) rotateY(45deg); }
+    100% { transform: scale(1) rotateY(0); filter: brightness(1); }
+}
+.pack-card.rarity-special::before {
+    content: "";
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,0,128,0.3) 50%, transparent 70%);
+    animation: shimmerSpecial 2s infinite linear;
+}
+@keyframes shimmerSpecial {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* ICON - Ultimate reveal with rainbow and shake */
+.pack-card.rarity-icon { 
+    border-color: var(--icon); 
+    box-shadow: 0 0 50px var(--icon), 0 0 100px rgba(0,255,255,0.5), 8px 8px 0 #000; 
+    animation: cardRevealIcon 1.2s ease-out;
+}
+@keyframes cardRevealIcon {
+    0% { transform: scale(0) rotateY(1080deg) rotateX(45deg); opacity: 0; }
+    30% { transform: scale(1.5) rotateY(540deg) rotateX(0deg); opacity: 1; filter: brightness(4); }
+    50% { transform: scale(0.8) rotateY(180deg); filter: brightness(2); }
+    70% { transform: scale(1.1) rotateY(45deg); }
+    85% { transform: scale(0.95) rotateY(-10deg); }
+    100% { transform: scale(1) rotateY(0); filter: brightness(1); }
+}
+.pack-card.rarity-icon::before {
+    content: "";
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: linear-gradient(45deg, 
+        rgba(255,0,0,0.2) 0%, 
+        rgba(255,127,0,0.2) 15%, 
+        rgba(255,255,0,0.2) 30%, 
+        rgba(0,255,0,0.2) 45%, 
+        rgba(0,127,255,0.2) 60%, 
+        rgba(127,0,255,0.2) 75%, 
+        rgba(255,0,127,0.2) 90%,
+        rgba(255,0,0,0.2) 100%
+    );
+    animation: rainbowShimmer 1.5s infinite linear;
+}
+@keyframes rainbowShimmer {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* CARD REVEAL DISPLAY */
+.pack-card-reveal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 30px;
+}
+.pack-card-reveal-single {
+    width: 180px;
+    padding: 25px;
+    margin: 10px;
+}
+.pack-card-multi {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    max-width: 95vw;
+}
+.pack-card-multi .pack-card {
+    width: 140px;
+    padding: 15px;
+}
+
+/* FIREWORKS FOR SPECIAL/ICON */
+.firework {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    animation: fireworkExplode 1s ease-out forwards;
+    z-index: 30001;
+    pointer-events: none;
+}
+@keyframes fireworkExplode {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(3); opacity: 0; }
+}
+
+/* SCREEN SHAKE */
+.screen-shake {
+    animation: screenShake 0.5s ease-out;
+}
+@keyframes screenShake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* PACK CARD STYLING */
+.pack-card-name { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px; 
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+}
+.pack-card-ovr { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 40px; 
+    color: var(--gold);
+    text-shadow: 4px 4px 0 #000;
+    position: relative;
+    z-index: 1;
+}
+.pack-card-pos { 
+    font-family: 'VT323', monospace;
+    font-size: 20px; 
+    color: var(--text-dim);
+    position: relative;
+    z-index: 1;
+}
+
+/* FULL PLAYER CARD (Modal) */
+.full-player-card {
+    background: linear-gradient(180deg, #1a1a2e 0%, #0d0d1f 100%);
+    border: 4px solid var(--gold);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.full-player-card.card-bronze { border-color: var(--bronze); background: linear-gradient(180deg, #3a2a1a 0%, #1a1005 100%); }
+.full-player-card.card-silver { border-color: var(--silver); background: linear-gradient(180deg, #2a2a2e 0%, #15151f 100%); }
+.full-player-card.card-gold { border-color: var(--gold); background: linear-gradient(180deg, #3a3a1a 0%, #1a1a05 100%); box-shadow: 0 0 20px rgba(255,215,0,0.3); }
+.full-player-card.card-special { border-color: var(--special); background: linear-gradient(180deg, #3a1a2e 0%, #1a0515 100%); box-shadow: 0 0 25px rgba(255,0,128,0.4); }
+.full-player-card.card-icon { border-color: var(--icon); background: linear-gradient(180deg, #1a3a3e 0%, #051a1f 100%); box-shadow: 0 0 30px rgba(0,255,255,0.4); }
+
+.full-player-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.full-player-card .card-ovr {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 28px;
+    color: var(--gold);
+    text-shadow: 2px 2px 0 #000;
+}
+
+.full-player-card .card-pos {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: #fff;
+    background: rgba(0,0,0,0.5);
+    padding: 6px 10px;
+    border-radius: 4px;
+}
+
+.card-player-image {
+    width: 100px;
+    height: 100px;
+    margin: 10px auto;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-player-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.full-player-card .card-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+    margin: 10px 0 5px;
+}
+
+.full-player-card .card-info {
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.full-player-card .card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    background: rgba(0,0,0,0.4);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.full-player-card .stat-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.full-player-card .stat-row span:first-child {
+    font-family: 'VT323', monospace;
+    font-size: 12px;
+    color: #888;
+}
+
+.full-player-card .stat-val {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    text-shadow: 1px 1px 0 #000;
+}
+
+.full-player-card .card-traits {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.trait-tag {
+    font-family: 'VT323', monospace;
+    font-size: 12px;
+    background: var(--purple);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.card-rarity-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: var(--gold);
+    margin-top: 10px;
+    letter-spacing: 2px;
+}
+.pack-card-club { 
+    font-size: 16px; 
+    color: var(--text-dim); 
+    margin-top: 10px;
+    position: relative;
+    z-index: 1;
+}
+.pack-card-rarity {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    text-transform: uppercase;
+    margin-top: 8px;
+    padding: 4px 8px;
+    position: relative;
+    z-index: 1;
+}
+.pack-card-rarity.bronze { color: var(--bronze); }
+.pack-card-rarity.silver { color: var(--silver); }
+.pack-card-rarity.gold { color: var(--gold); }
+.pack-card-rarity.special { color: var(--special); text-shadow: 0 0 10px var(--special); }
+.pack-card-rarity.icon { color: var(--icon); text-shadow: 0 0 10px var(--icon); animation: iconPulse 1s infinite; }
+@keyframes iconPulse {
+    0%, 100% { text-shadow: 0 0 10px var(--icon); }
+    50% { text-shadow: 0 0 20px var(--icon), 0 0 30px var(--icon); }
+}
+
+/* MATCH VIEW */
+.scoreboard { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 20px; 
+    padding: 30px;
+    background: linear-gradient(180deg, var(--retro-red) 0%, #660000 100%);
+    border-bottom: 4px solid #000;
+}
+.team-label { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+}
+.score-box { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 32px; 
+    color: var(--gold);
+    text-shadow: 4px 4px 0 #000;
+    background: #000;
+    padding: 10px 25px;
+    border: 4px solid var(--gold);
+}
+.timer-box { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 18px;
+    text-align: center; 
+    padding: 15px;
+    color: var(--green);
+    text-shadow: 2px 2px 0 #000;
+}
+
+.pitch-visual { 
+    flex: 1; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    background: repeating-linear-gradient(
+        90deg,
+        #1a5c1a 0px,
+        #1a5c1a 40px,
+        #228822 40px,
+        #228822 80px
+    );
+    border: 4px solid #fff;
+    margin: 10px;
+}
+.pitch-field { 
+    width: 90%; 
+    height: 80%; 
+    border: 4px solid #fff; 
+    position: relative;
+}
+.pitch-center-circle { 
+    position: absolute; 
+    top: 50%; left: 50%; 
+    transform: translate(-50%, -50%);
+    width: 80px; height: 80px; 
+    border: 4px solid #fff; 
+    border-radius: 50%;
+}
+.pitch-center-line { 
+    position: absolute; 
+    top: 0; bottom: 0; 
+    left: 50%; 
+    width: 4px; 
+    background: #fff;
+}
+
+.commentary-box { 
+    font-family: 'VT323', monospace;
+    font-size: 20px;
+    text-align: center; 
+    padding: 20px;
+    color: var(--retro-white);
+    background: #000;
+    border: 4px solid #333;
+    margin: 10px;
+    min-height: 60px;
+}
+
+/* MARKET */
+.market-search { 
+    display: flex; 
+    gap: 10px; 
+    padding: 15px;
+    flex-wrap: wrap;
+}
+.market-search input, .market-search select { 
+    flex: 1; 
+    min-width: 100px;
+    background: #000;
+    border: 3px solid #444;
+    color: var(--green);
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    padding: 10px;
+}
+.market-search select { cursor: pointer; }
+
+.market-listing { 
+    background: linear-gradient(180deg, #1a1a2e 0%, #0a0a1a 100%);
+    border: 3px solid #444;
+    margin: 10px 15px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 4px 4px 0 #000;
+}
+.market-listing.rarity-gold { border-color: var(--gold); }
+.market-listing.rarity-special { border-color: var(--special); }
+.market-listing.rarity-icon { border-color: var(--icon); }
+
+.listing-info { flex: 1; }
+.listing-name { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+}
+.listing-details { font-size: 14px; color: var(--text-dim); margin-top: 5px; }
+.listing-price { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    text-shadow: 2px 2px 0 #000;
+}
+
+/* SBC */
+.sbc-category-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    margin: 20px 15px 10px;
+    text-shadow: 2px 2px 0 #000;
+}
+.sbc-item {
+    background: linear-gradient(180deg, #1a1a2e 0%, #0a0a1a 100%);
+    border: 3px solid var(--purple);
+    margin: 8px 15px;
+    padding: 15px;
+    box-shadow: 4px 4px 0 #000;
+    cursor: pointer;
+    transition: transform 0.1s, border-color 0.2s;
+}
+.sbc-item:hover, .sbc-item:active {
+    transform: scale(1.02);
+    border-color: var(--gold);
+}
+.sbc-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: #fff;
+    margin-bottom: 5px;
+}
+.sbc-desc {
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+    color: #aaa;
+    margin-bottom: 8px;
+}
+.sbc-rewards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.reward-tag {
+    background: var(--green);
+    color: #000;
+    padding: 4px 8px;
+    font-family: 'VT323', monospace;
+    font-size: 14px;
+    border-radius: 3px;
+}
+.sbc-card { 
+    background: linear-gradient(180deg, #1a1a2e 0%, #0a0a1a 100%);
+    border: 3px solid var(--purple);
+    margin: 10px 15px;
+    padding: 15px;
+    box-shadow: 4px 4px 0 #000;
+}
+.sbc-title { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    text-shadow: 2px 2px 0 #000;
+}
+.sbc-reward { 
+    font-size: 14px; 
+    color: var(--green); 
+    margin-top: 8px;
+}
+.sbc-req { 
+    font-size: 14px; 
+    color: var(--text-dim); 
+    margin-top: 5px;
+}
+.sbc-requirements ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+.sbc-requirements li {
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    color: #ccc;
+    padding: 5px 0;
+    border-bottom: 1px solid #333;
+}
+.sbc-players-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 10px;
+    margin: 15px 0;
+}
+.sbc-player-slot {
+    width: 60px;
+    height: 80px;
+    background: #222;
+    border: 2px solid #555;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 10px;
+    text-align: center;
+    padding: 5px;
+}
+.sbc-player-slot.rarity-gold { border-color: #ffd700; background: linear-gradient(180deg, #3a3000, #1a1500); }
+.sbc-player-slot.rarity-silver { border-color: #c0c0c0; background: linear-gradient(180deg, #2a2a2a, #1a1a1a); }
+.sbc-player-slot.rarity-bronze { border-color: #cd7f32; background: linear-gradient(180deg, #2a1a0a, #1a0a00); }
+.sbc-rewards-display {
+    background: #111;
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 5px;
+}
+.sbc-rewards-display h3 {
+    color: var(--gold);
+    margin-bottom: 10px;
+}
+.reward-item {
+    color: var(--green);
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    padding: 5px 0;
+}
+
+/* OBJECTIVES */
+.objective-card { 
+    background: linear-gradient(180deg, #1a1a2e 0%, #0a0a1a 100%);
+    border: 3px solid var(--retro-blue);
+    margin: 10px 15px;
+    padding: 15px;
+    box-shadow: 4px 4px 0 #000;
+}
+.objective-card.completed { border-color: var(--green); opacity: 0.7; }
+.objective-title { 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+}
+.objective-progress { 
+    margin-top: 10px;
+    background: #000;
+    height: 20px;
+    border: 2px solid #444;
+    position: relative;
+}
+.objective-bar { 
+    height: 100%;
+    background: linear-gradient(90deg, var(--retro-blue), var(--green));
+    transition: width 0.3s;
+}
+.objective-text { 
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'VT323', monospace;
+    font-size: 14px;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+}
+.objective-reward { 
+    font-size: 14px;
+    color: var(--gold);
+    margin-top: 8px;
+}
+
+.objectives-section {
+    padding: 15px;
+}
+.objectives-section h3 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 0 #000;
+}
+.objectives-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.objective-item {
+    background: linear-gradient(180deg, #1a1a2e 0%, #0a0a1a 100%);
+    border: 2px solid #444;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+.objective-item.completed { border-color: var(--green); }
+.objective-item.claimed { opacity: 0.5; }
+.obj-info { flex: 1; min-width: 150px; }
+.obj-name { font-family: 'Press Start 2P', monospace; font-size: 8px; color: #fff; margin-bottom: 4px; }
+.obj-desc { font-family: 'VT323', monospace; font-size: 14px; color: #888; margin-bottom: 8px; }
+.obj-progress { display: flex; align-items: center; gap: 10px; }
+.obj-progress .progress-bar { flex: 1; height: 8px; background: #222; border-radius: 4px; overflow: hidden; }
+.obj-progress .progress-fill { height: 100%; background: linear-gradient(90deg, var(--retro-blue), var(--green)); }
+.obj-rewards { font-family: 'VT323', monospace; font-size: 14px; color: var(--gold); }
+
+/* ACHIEVEMENTS */
+.achievements-section {
+    border-top: 3px solid #333;
+    margin-top: 20px;
+    padding-top: 20px;
+}
+.ach-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+.ach-filter {
+    font-family: 'VT323', monospace;
+    font-size: 14px;
+    padding: 6px 12px;
+    background: #1a1a2e;
+    border: 2px solid #444;
+    color: #888;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.ach-filter.active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: #2a2a3e;
+}
+.achievements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.ach-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(180deg, #1a1a2e 0%, #0a0a1a 100%);
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+.ach-item.completed {
+    border-color: var(--green);
+    background: linear-gradient(180deg, #1a2e1a 0%, #0a1a0a 100%);
+}
+.ach-icon {
+    font-size: 24px;
+    width: 35px;
+    text-align: center;
+}
+.ach-info {
+    flex: 1;
+    min-width: 0;
+}
+.ach-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: #fff;
+    margin-bottom: 3px;
+    text-shadow: 1px 1px 0 #000;
+}
+.ach-desc {
+    font-family: 'VT323', monospace;
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 6px;
+}
+.ach-progress-bar {
+    height: 6px;
+    background: #222;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 3px;
+}
+.ach-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple), var(--gold));
+    transition: width 0.3s;
+}
+.ach-progress-text {
+    font-family: 'VT323', monospace;
+    font-size: 12px;
+    color: #666;
+}
+.ach-item.completed .ach-progress-fill {
+    background: var(--green);
+}
+.ach-reward {
+    font-family: 'VT323', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* PROFILE */
+.profile-header {
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(180deg, var(--retro-blue) 0%, #003366 100%);
+    border-bottom: 4px solid #000;
+}
+
+.profile-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    color: var(--gold);
+    text-shadow: 3px 3px 0 #000;
+    margin-bottom: 10px;
+}
+
+.profile-rating {
+    font-family: 'VT323', monospace;
+    font-size: 24px;
+    color: #fff;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 15px;
+}
+
+.profile-stat {
+    background: #111;
+    border: 3px solid #333;
+    padding: 15px;
+    text-align: center;
+}
+
+.profile-stat-value {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    color: var(--gold);
+    text-shadow: 2px 2px 0 #000;
+}
+
+.profile-stat-label {
+    font-family: 'VT323', monospace;
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 5px;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: var(--retro-red); border: 2px solid #000; }
+
+/* STORE/BAG MODAL */
+.bag-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 15px;
+}
+
+.bag-item {
+    background: #111;
+    border: 3px solid #444;
+    padding: 15px;
+    text-align: center;
+}
+
+.bag-item-icon {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.bag-item-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: #fff;
+}
+
+.bag-item-count {
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    color: var(--gold);
+    margin-top: 5px;
+}
+
+/* PACK STORE */
+.pack-store-item {
+    background: linear-gradient(180deg, #1a1a2e 0%, #0a0a1a 100%);
+    border: 3px solid var(--gold);
+    margin: 10px 15px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 4px 4px 0 #000;
+}
+
+.pack-icon {
+    font-size: 40px;
+}
+
+.pack-info {
+    flex: 1;
+}
+
+.pack-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: #fff;
+}
+
+.pack-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 5px;
+}
+
+.pack-price {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: var(--gold);
+}
+
+/* DIVISION DISPLAY */
+.division-display {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+}
+
+.division-badge {
+    font-size: 60px;
+    margin-bottom: 10px;
+}
+
+.division-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    text-shadow: 2px 2px 0 #000;
+}
+
+.division-rating {
+    font-family: 'VT323', monospace;
+    font-size: 28px;
+    color: #fff;
+    margin-top: 10px;
+}
+
+/* ACHIEVEMENTS */
+.achievement-card {
+    background: linear-gradient(180deg, #1a1a2e 0%, #0a0a1a 100%);
+    border: 3px solid #444;
+    margin: 10px 15px;
+    padding: 15px;
+    box-shadow: 4px 4px 0 #000;
+}
+
+.achievement-card.unlocked {
+    border-color: var(--gold);
+}
+
+.achievement-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: #fff;
+}
+
+.achievement-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 5px;
+}
+
+.achievement-reward {
+    font-size: 14px;
+    color: var(--gold);
+    margin-top: 8px;
+}
+
+/* TABS */
+.tab-bar {
+    display: flex;
+    background: #111;
+    border-bottom: 4px solid #000;
+}
+
+.tab-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: #666;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    padding: 12px 8px;
+    cursor: pointer;
+    border-bottom: 4px solid transparent;
+    margin-bottom: -4px;
+}
+
+.tab-btn.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+}
+
+/* CONTRACTS */
+.contract-slot {
+    background: linear-gradient(180deg, #1a1a2e 0%, #0a0a1a 100%);
+    border: 3px solid #444;
+    margin: 10px 15px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 4px 4px 0 #000;
+}
+
+.contract-slot.active {
+    border-color: var(--green);
+}
+
+.contract-tier {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    margin-bottom: 10px;
+}
+
+.contract-progress {
+    background: #000;
+    height: 25px;
+    border: 3px solid #444;
+    position: relative;
+    margin-top: 15px;
+}
+
+.contract-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--retro-red), var(--gold));
+}
+
+.contract-time {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+    color: #fff;
+}
+
+/* PACK INCUBATOR SYSTEM */
+.pack-btn {
+    position: absolute;
+    top: 130px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, var(--retro-blue) 0%, #001a66 100%);
+    border: 4px solid #000;
+    box-shadow: 4px 4px 0 #000;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1000;
+}
+.pack-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
+
+.incubator-display {
+    position: absolute;
+    bottom: 80px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1000;
+    max-width: 140px;
+}
+
+.incubator-slot {
+    background: rgba(0, 0, 0, 0.9);
+    border: 3px solid #333;
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+}
+.incubator-slot.empty {
+    border-style: dashed;
+    opacity: 0.7;
+}
+.incubator-slot.active {
+    border-width: 4px;
+}
+
+/* CONTRACT HUD */
+.active-contract-hud {
+    position: absolute;
+    bottom: 80px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1000;
+    max-width: 140px;
+}
+.contract-hud-title {
+    display: none;
+}
+.active-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.hud-slot {
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #555;
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+    transition: transform 0.1s, border-color 0.2s;
+    width: 100%;
+}
+.hud-slot:hover, .hud-slot:active {
+    transform: scale(1.02);
+    border-color: var(--gold);
+}
+.tier-bronze { color: #cd7f32; }
+.tier-silver { color: #c0c0c0; }
+.tier-gold { color: #ffd700; }
+.progress-track {
+    height: 8px;
+    background: #222;
+    border-radius: 4px;
+    margin: 5px 0;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+.tier-fill-bronze { background: linear-gradient(90deg, #cd7f32, #8B5A2B); }
+.tier-fill-silver { background: linear-gradient(90deg, #c0c0c0, #808080); }
+.tier-fill-gold { background: linear-gradient(90deg, #ffd700, #B8860B); }
+.incubator-icon {
+    font-size: 28px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.incubator-icon svg {
+    width: 35px;
+    height: 45px;
+}
+.incubator-label, .incubator-name {
+    font-family: 'VT323', monospace;
+    font-size: 14px;
+    color: #888;
+}
+.incubator-name { color: #fff; }
+.incubator-progress {
+    height: 8px;
+    background: #222;
+    border-radius: 4px;
+    margin: 8px 0;
+    overflow: hidden;
+}
+.incubator-progress .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+.incubator-dist {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: #0f0;
+}
+
+/* PACK MANAGER MODAL */
+.pack-manager-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+.pack-manager-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.pack-manager-header h2 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    color: var(--retro-red);
+    margin: 0;
+}
+.pack-manager-close {
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.pack-incubators {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 25px;
+    padding: 15px;
+    background: #111;
+    border: 3px solid var(--retro-blue);
+    border-radius: 8px;
+}
+.pack-incubator-slot {
+    flex: 1;
+    max-width: 150px;
+    background: #1a1a2e;
+    border: 3px solid #333;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+}
+.pack-incubator-slot.active { border-color: var(--green); }
+
+.pack-storage-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: #fff;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.pack-storage-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+.pack-storage-item {
+    background: #1a1a2e;
+    border: 3px solid #333;
+    border-radius: 8px;
+    padding: 15px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+.pack-storage-item:hover {
+    transform: scale(1.05);
+    border-color: #fff;
+}
+.pack-storage-icon {
+    font-size: 24px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pack-storage-icon svg {
+    width: 40px;
+    height: 55px;
+}
+.pack-storage-name {
+    font-family: 'VT323', monospace;
+    font-size: 14px;
+    color: #fff;
+}
+.pack-storage-dist {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: #888;
+    margin-top: 5px;
+}
+.pack-storage-empty {
+    background: #111;
+    border-style: dashed;
+    opacity: 0.5;
+}
